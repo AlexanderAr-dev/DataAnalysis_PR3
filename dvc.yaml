@@ -1,0 +1,27 @@
+stages:
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+      - src/preprocess.py
+      - data/train.csv
+    outs:
+      - data/train_split.csv
+      - data/val_split.csv
+
+  train:
+    cmd: python src/train.py
+    deps:
+      - src/train.py
+      - data/train_split.csv
+    outs:
+      - models/
+    params:
+      - train
+
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+      - src/evaluate.py
+      - models/
+    outs:
+      - metrics/val_metrics.json
