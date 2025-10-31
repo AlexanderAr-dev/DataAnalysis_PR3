@@ -1,27 +1,48 @@
 stages:
-  preprocess:
-    cmd: python src/preprocess.py
+  augment:
+    cmd: python -m pipelines.augment
     deps:
-      - src/preprocess.py
-      - data/train.csv
+    - pipelines/augment.py
+    - src/augmentation.py
+    - data/raw/train.csv
+    - data/raw/train_images
     outs:
-      - data/train_split.csv
-      - data/val_split.csv
+    - data/augmented/train_augmented.csv
+    - data/augmented/train
 
-  train:
-    cmd: python src/train.py
+  train_original:
+    cmd: python -m pipelines.train
     deps:
-      - src/train.py
-      - data/train_split.csv
-    outs:
-      - models/
+    - pipelines/train.py
+    - src/
+    - data/raw/train.csv
+    - data/raw/train_images
     params:
-      - train
+    - data.use_augmented
+    - models
+    - training
+    metrics:
+    - metrics_original.json:
+        cache: false
 
-  evaluate:
-    cmd: python src/evaluate.py
+  train_augmented:
+    cmd: python -m pipelines.train
     deps:
-      - src/evaluate.py
-      - models/
-    outs:
-      - metrics/val_metrics.json
+    - pipelines/train.py
+    - src/
+    - data/augmented/train_augmented.csv
+    - data/augmented/train
+    params:
+    - data.use_augmented
+    - models
+    - training
+    metrics:
+    - metrics_augmented.json:
+        cache: false
+params:
+- dvclive_original/params.yaml
+metrics:
+- dvclive_original/metrics.json
+plots:
+- dvclive_original/plots/metrics:
+    x: step
