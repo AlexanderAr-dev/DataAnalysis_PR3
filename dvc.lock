@@ -1,0 +1,95 @@
+schema: '2.0'
+stages:
+  prepare_data:
+    cmd: python -m src.data_preprocessing
+    deps:
+    - path: data/raw/train.csv
+      hash: md5
+      md5: 029873b316e5322963b7cea1a6000d67
+      size: 586183
+    - path: data/raw/train_images
+      hash: md5
+      md5: 79387014ec584cdbef449a2c7e917c31.dir
+      size: 16094073168
+      nfiles: 18632
+    - path: src/data_preprocessing.py
+      hash: md5
+      md5: 58c59ee3d846716d889f495ac0b6d43b
+      size: 4912
+    outs:
+    - path: data/processed/label_encoder.pkl
+      hash: md5
+      md5: b385c56b75d1f812878135f3f11c84c2
+      size: 470
+    - path: data/processed/train_data.pt
+      hash: md5
+      md5: 958c71e383f8e23c70808486f3261d56
+      size: 867775
+    - path: data/processed/val_data.pt
+      hash: md5
+      md5: f6bcf5b9df8fdefd499622c31bb42ad3
+      size: 834355
+  augment_data:
+    cmd: python -m src.augmentation
+    deps:
+    - path: data/raw/train.csv
+      hash: md5
+      md5: 029873b316e5322963b7cea1a6000d67
+      size: 586183
+    - path: data/raw/train_images
+      hash: md5
+      md5: 79387014ec584cdbef449a2c7e917c31.dir
+      size: 16094073168
+      nfiles: 18632
+    - path: src/augmentation.py
+      hash: md5
+      md5: 9d75cb302225a332a2df7af68d5e3df0
+      size: 4395
+    params:
+      params.yaml:
+        augmentation.augment_factor: 2
+        augmentation.brightness_range:
+        - 0.8
+        - 1.2
+        augmentation.enable: true
+        augmentation.height_shift: 0.2
+        augmentation.horizontal_flip: true
+        augmentation.rotations: 30
+        augmentation.width_shift: 0.2
+        augmentation.zoom_range: 0.2
+    outs:
+    - path: data/augmented/
+      hash: md5
+      md5: d06fec33f096d4c988c0e80e92c07616.dir
+      size: 95391222150
+      nfiles: 55897
+  augment:
+    cmd: python -m pipelines.augment
+    deps:
+    - path: data/raw/train.csv
+      hash: md5
+      md5: 029873b316e5322963b7cea1a6000d67
+      size: 586183
+    - path: data/raw/train_images
+      hash: md5
+      md5: 79387014ec584cdbef449a2c7e917c31.dir
+      size: 16094073168
+      nfiles: 18632
+    - path: pipelines/augment.py
+      hash: md5
+      md5: ce829efdc5ee2412758e9b3fae76e308
+      size: 534
+    - path: src/augmentation.py
+      hash: md5
+      md5: 41b822e29849607b349cf4a85996333a
+      size: 3753
+    outs:
+    - path: data/augmented/train
+      hash: md5
+      md5: 0a1b1a5bbb3e48f31fe5f3a38dfab977.dir
+      size: 204101164
+      nfiles: 18632
+    - path: data/augmented/train_augmented.csv
+      hash: md5
+      md5: 11941da63f142cbee41f0e94913f609c
+      size: 716608
